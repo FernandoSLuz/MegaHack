@@ -7,7 +7,7 @@ main = Blueprint('main', __name__, template_folder='views')
 
 @main.route('/')
 def index():
-   return render_template("index.html")
+   return {"Hackathon":"MegaHack"}
 
 @main.route('/Olist/question', methods=['POST'])
 def GetOlistQuestion():

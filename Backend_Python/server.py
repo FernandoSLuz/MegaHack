@@ -1,5 +1,8 @@
 #!/usr/bin/python
-
+from app import Flask
 from app import create_app
 
-create_app().run()
+app = create_app(True)
+
+if __name__ == '__main__':
+    Flask.run(app, debug=True)
