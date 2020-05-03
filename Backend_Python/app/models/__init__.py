@@ -1,3 +1,1 @@
-"""
-Handle db connection.
-"""
+from . import DialogflowHandler
