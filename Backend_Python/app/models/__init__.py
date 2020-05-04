@@ -1,1 +1,1 @@
-from . import DialogflowHandler
+from . import IBMHandler
