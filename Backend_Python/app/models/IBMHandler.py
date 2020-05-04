@@ -27,8 +27,8 @@ def CreateDialog(form):
     response = assistant.create_dialog_node(
         workspace_id=workspace_id,
         dialog_node='P3_Q1',
-        conditions='@Products:_P1_ and #P3_Q1',
-        output=[{'response_type': 'text', 'values': [{'text': 'Tem.'}]}],
+        conditions='@Products:_P3_ and #P3_Q1',
+        output={'generic':[{'response_type': 'text', 'values': [{'text': 'Tem.'}]}]},
         title='P3_Q1'
     ).get_result()
     return response
