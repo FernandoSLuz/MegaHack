@@ -13,54 +13,88 @@ assistant.set_service_url('https://api.us-east.assistant.watson.cloud.ibm.com')
 
 
 def MakeQuestion(form):
-    print("test")
+    product_id = GenerateProductString(form['product_id'])
+    question_code = ""
+    question = form['question']
+    print(f'{product_id} {question}')
     response = assistant.message(
         workspace_id=workspace_id,
+        nodes_visited_details = True,
         input={
-            'text': '_P3_ validade'
+            'text': f'{product_id} {question}'
         }
     ).get_result()
+    if(not len(response['output']['text'])):
+        question_code = GetIntentName(form['product_id'])
+        CreateIntent(question_code, question)
+        response = {
+            'question_code': question_code,
+            'sugested_answer': ''
+        }
+    else:
+        response = {
+            'question_code': response['output']['nodes_visited_details'][0]['title'],
+            'sugested_answer': response['output']['generic'][0]['text']
+        }
     return response
 
 
 def CreateDialog(form):
+    question_code = form['question_code']
+    product_code = (question_code)[:question_code.find('q')-1:]
     response = assistant.create_dialog_node(
         workspace_id=workspace_id,
-        dialog_node='P3_Q1',
-        conditions='@Products:_P3_ and #P3_Q1',
-        output={'generic':[{'response_type': 'text', 'values': [{'text': 'Tem.'}]}]},
-        title='P3_Q1'
+        dialog_node=form['question_code'],
+        conditions=f'@Products:_{product_code}_ and #{question_code}',
+        output={'generic':[{'response_type': 'text', 'values': [{'text': form['answer']}]}]},
+        title=question_code
     ).get_result()
     return response
 
 
-def CreateIntent(form):
+def CreateIntent(question_code, question):
     response = assistant.create_intent(
         workspace_id=workspace_id,
-        intent='P6_Q1',
+        intent=question_code,
         examples=[
-            {'text': 'Qual o tamanho ?'}
+            {'text': question}
         ]
     ).get_result()
     print(json.dumps(response, indent=2))
-    return {'status': 'sucess'}
 
 
-def EditEntity(form):
+def EditEntity(entity_code):
     response = assistant.update_entity(
         workspace_id=workspace_id,
         entity='Products',
         new_values=[{
-            'value': '_P6_'
+            'value': entity_code
         }],
         append=True
     ).get_result()
     return response
 
 
-def GetIntents(form):
-    response = assistant.get_intent(
+def ListIntents():
+    response = assistant.list_intents(
         workspace_id=workspace_id,
-        intent='P1_Q3'
     ).get_result()
     return response
+
+def GenerateProductString(product):
+    product = f'_P{str(product)}_'
+    return product
+
+def GetIntentName(product_id):
+    form = ListIntents()
+    intents = []
+    for intent in form['intents']:
+        if(("P"+str(product_id)) in intent['intent']): 
+            intents.append(int((intent['intent']).replace("P"+str(product_id)+"Q", "")))
+    if(len(intents) == 0):
+        question = 'Q1'
+        EditEntity(f'_P{product_id}_')
+    else:
+        intents.sort()
+        question = f'Q{intents[len(intents)-1]+1}'
+    return(f'P{product_id}{question}')
