@@ -18,7 +18,7 @@ def GetOlistQuestion():
         status_code = 406
         callbackDict = {'feedback': 'missing POST body data'}
     else:
-        callbackDict = models.IBMHandler.MakeQuestion(form)
+        callbackDict = models.IBMHandler.CreateDialog(form)
         status_code = 200
     return json.dumps(callbackDict, indent=2, default=str, ensure_ascii=False), status_code
 

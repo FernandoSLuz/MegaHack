@@ -21,6 +21,11 @@ def MakeQuestion(form):
     return response
 
 def CreateDialog(form):
+    response=assistant.create_dialog_node(
+        dialog_node='P3_Q1',
+        conditions='@Products:_P1_ and #P3_Q1',
+        title='P3_Q1'
+    ).get_result()
     return {'status': 'sucess'}
 
 def CreateIntent(form):
