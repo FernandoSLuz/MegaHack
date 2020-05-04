@@ -15,18 +15,20 @@ def MakeQuestion(form):
     response = assistant.message(
         workspace_id= workspace_id,
         input={
-            'text': '_P1_ voltagem'
+            'text': '_P3_ validade'
         }
     ).get_result()
     return response
 
 def CreateDialog(form):
-    response=assistant.create_dialog_node(
+    response =assistant.create_dialog_node(
+        workspace_id= workspace_id,
         dialog_node='P3_Q1',
         conditions='@Products:_P1_ and #P3_Q1',
+        output=[{'response_type':'text','values':[{'text':'Tem.'}]}],
         title='P3_Q1'
     ).get_result()
-    return {'status': 'sucess'}
+    return response
 
 def CreateIntent(form):
     return {'status': 'sucess'}
