@@ -11,6 +11,7 @@ workspace_id = 'ac2daa7b-0ce4-4a2c-b969-87304b30ac2d'
 assistant.set_service_url('https://api.us-east.assistant.watson.cloud.ibm.com')
 
 def MakeQuestion(form):
+    print("test")
     response = assistant.message(
         workspace_id= workspace_id,
         input={
