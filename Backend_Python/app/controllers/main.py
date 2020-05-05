@@ -5,9 +5,11 @@ import json
 
 main = Blueprint('main', __name__, template_folder='views')
 
-@main.route('/')
+@main.route('/', methods=['POST'])
 def index():
-   return {"Hackathon":"MegaHack"}
+   form = request.get_json(silent=True, force=True)
+
+   return {"message":"rolarolarola"}
 
 @main.route('/Olist/question', methods=['POST'])
 def GetOlistQuestion():
@@ -18,7 +20,7 @@ def GetOlistQuestion():
         status_code = 406
         callbackDict = {'feedback': 'missing POST body data'}
     else:
-        callbackDict = models.IBMHandler.MakeQuestion(form)
+        callbackDict = models.IBMHandler.MakeComplexQuestion(form)
         status_code = 200
     return json.dumps(callbackDict, indent=2, default=str, ensure_ascii=False), status_code
 
@@ -35,3 +37,11 @@ def GetOlistAnswer():
         callbackDict = {'Status': 'Pergunta cadastrada'}
         status_code = 200
     return json.dumps(callbackDict, indent=2, default=str, ensure_ascii=False), status_code
+
+# @main.route('/webhook', methods=['POST'])
+# def webhook():
+#     form = request.get_json(silent=True, force=True)
+#     status_code = 0
+#     print(form)
+#     callbackDict = {'message': 'Rola rola rola rola rola'}
+#     return json.dumps(callbackDict, indent=2, default=str, ensure_ascii=False), status_code

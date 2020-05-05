@@ -12,11 +12,34 @@ workspace_id = 'ac2daa7b-0ce4-4a2c-b969-87304b30ac2d'
 assistant.set_service_url('https://api.us-east.assistant.watson.cloud.ibm.com')
 
 
-def MakeQuestion(form):
-    product_id = GenerateProductString(form['product_id'])
+def MakeComplexQuestion(form):
+    product_id = str(form['product_id'])
+    ad_id = str(form['ad_id'])
+    code = f'P{product_id}A{ad_id}'
+    question = form['question']
+    response = assistant.message(
+        workspace_id=workspace_id,
+        nodes_visited_details = True,
+        input={
+            'text': f'{code} _Webhook {question}'
+        }
+    ).get_result()
+    if(not len(response['output']['text'])):
+        #return response
+        response = MakeSimpleQuestion(form)
+    else:
+        #return response
+        response = {
+            'question_code': response['output']['nodes_visited_details'][0]['title'],
+            'sugested_answer': response['output']['generic'][0]['text']
+        } 
+    return response
+
+def MakeSimpleQuestion(form):
+    product_id = str(form['product_id'])
+    product_id = f'_P{product_id}_'
     question_code = ""
     question = form['question']
-    print(f'{product_id} {question}')
     response = assistant.message(
         workspace_id=workspace_id,
         nodes_visited_details = True,
@@ -60,7 +83,6 @@ def CreateIntent(question_code, question):
             {'text': question}
         ]
     ).get_result()
-    print(json.dumps(response, indent=2))
 
 
 def EditEntity(entity_code):
@@ -80,10 +102,6 @@ def ListIntents():
         workspace_id=workspace_id,
     ).get_result()
     return response
-
-def GenerateProductString(product):
-    product = f'_P{str(product)}_'
-    return product
 
 def GetIntentName(product_id):
     form = ListIntents()
